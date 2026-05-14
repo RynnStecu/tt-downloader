@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TT Downloader — @RynnStecu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --black:   #050507;
+  --dark1:   #0d0d12;
+  --dark2:   #13131a;
+  --dark3:   #1c1c26;
+  --border:  rgba(255,255,255,0.07);
+  --borderH: rgba(255,255,255,0.18);
+  --text:    #efefef;
+  --sub:     #6b6b7e;
+  --accent:  #8b0000;
+  --white:   #ffffff;
+}
+
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+.orb {
+  position: fixed;
+  border-radius: 50%;
+  -webkit-filter: blur(80px);
+          filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb1 {
+  width: 420px; height: 420px;
+  background: -webkit-radial-gradient(circle, rgba(139,0,0,0.18) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(139,0,0,0.18) 0%, transparent 70%);
+  top: -100px; left: -100px;
+  -webkit-animation: drift1 12s ease-in-out infinite alternate;
+          animation: drift1 12s ease-in-out infinite alternate;
+}
+.orb2 {
+  width: 350px; height: 350px;
+  background: -webkit-radial-gradient(circle, rgba(100,80,255,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(100,80,255,0.12) 0%, transparent 70%);
+  bottom: -80px; right: -80px;
+  -webkit-animation: drift2 15s ease-in-out infinite alternate;
+          animation: drift2 15s ease-in-out infinite alternate;
+}
+.orb3 {
+  width: 200px; height: 200px;
+  background: -webkit-radial-gradient(circle, rgba(255,200,0,0.07) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255,200,0,0.07) 0%, transparent 70%);
+  top: 50%; left: 50%;
+  -webkit-transform: translate(-50%,-50%);
+      -ms-transform: translate(-50%,-50%);
+          transform: translate(-50%,-50%);
+  -webkit-animation: drift1 9s ease-in-out infinite alternate;
+          animation: drift1 9s ease-in-out infinite alternate;
+}
+
+@-webkit-keyframes drift1 {
+  from { -webkit-transform: translate(0,0); transform: translate(0,0); }
+  to   { -webkit-transform: translate(40px, 30px); transform: translate(40px, 30px); }
+}
+@keyframes drift1 {
+  from { -webkit-transform: translate(0,0); transform: translate(0,0); }
+  to   { -webkit-transform: translate(40px, 30px); transform: translate(40px, 30px); }
+}
+@-webkit-keyframes drift2 {
+  from { -webkit-transform: translate(0,0); transform: translate(0,0); }
+  to   { -webkit-transform: translate(-30px, -40px); transform: translate(-30px, -40px); }
+}
+@keyframes drift2 {
+  from { -webkit-transform: translate(0,0); transform: translate(0,0); }
+  to   { -webkit-transform: translate(-30px, -40px); transform: translate(-30px, -40px); }
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 480px;
+  background: rgba(13,13,18,0.85);
+  -webkit-backdrop-filter: blur(24px);
+          backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  overflow: hidden;
+  -webkit-animation: rise .7s cubic-bezier(.16,1,.3,1) both;
+          animation: rise .7s cubic-bezier(.16,1,.3,1) both;
+}
+
+@-webkit-keyframes rise {
+  from { opacity:0; -webkit-transform:translateY(32px) scale(.97); transform:translateY(32px) scale(.97); }
+  to   { opacity:1; -webkit-transform:translateY(0) scale(1); transform:translateY(0) scale(1); }
+}
+@keyframes rise {
+  from { opacity:0; -webkit-transform:translateY(32px) scale(.97); transform:translateY(32px) scale(.97); }
+  to   { opacity:1; -webkit-transform:translateY(0) scale(1); transform:translateY(0) scale(1); }
+}
+
+.card::before {
+  content:'';
+  position: absolute;
+  top:0; left:0; right:0;
+  height: 2px;
+  background: -webkit-linear-gradient(left, transparent 0%, var(--accent) 40%, #a855f7 70%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 40%, #a855f7 70%, transparent 100%);
+}
+
+.topbar {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 22px 24px 0;
+}
+
+.logo-mark {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-size: 16px;
+  -webkit-box-shadow: 0 4px 16px rgba(139,0,0,0.4);
+          box-shadow: 0 4px 16px rgba(139,0,0,0.4);
+  -webkit-animation: iconPop .8s cubic-bezier(.34,1.56,.64,1) .2s both;
+          animation: iconPop .8s cubic-bezier(.34,1.56,.64,1) .2s both;
+}
+
+@-webkit-keyframes iconPop {
+  from { -webkit-transform: scale(0) rotate(-15deg); transform: scale(0) rotate(-15deg); }
+  to   { -webkit-transform: scale(1) rotate(0deg); transform: scale(1) rotate(0deg); }
+}
+@keyframes iconPop {
+  from { -webkit-transform: scale(0) rotate(-15deg); transform: scale(0) rotate(-15deg); }
+  to   { -webkit-transform: scale(1) rotate(0deg); transform: scale(1) rotate(0deg); }
+}
+
+.logo-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--sub);
+  text-transform: uppercase;
+}
+
+.menu-wrap { position: relative; }
+
+.menu-btn {
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 38px; height: 38px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  cursor: pointer;
+  -webkit-transition: all .2s;
+  -o-transition: all .2s;
+     transition: all .2s;
+  gap: 3px;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.menu-btn:hover { border-color: var(--borderH); background: var(--dark2); }
+
+.menu-btn span {
+  display: block;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--sub);
+  -webkit-transition: background .2s;
+  -o-transition: background .2s;
+     transition: background .2s;
+}
+
+.menu-btn:hover span { background: var(--text); }
+
+.dropdown {
+  position: absolute;
+  top: 46px; right: 0;
+  background: var(--dark2);
+  border: 1px solid var(--borderH);
+  border-radius: 16px;
+  padding: 8px;
+  min-width: 210px;
+  display: none;
+  -webkit-box-shadow: 0 24px 48px rgba(0,0,0,0.7);
+          box-shadow: 0 24px 48px rgba(0,0,0,0.7);
+  z-index: 99;
+}
+
+.dropdown.open {
+  display: block;
+  -webkit-animation: dropPop .2s cubic-bezier(.34,1.4,.64,1);
+          animation: dropPop .2s cubic-bezier(.34,1.4,.64,1);
+}
+
+@-webkit-keyframes dropPop {
+  from { opacity:0; -webkit-transform: translateY(-8px) scale(.95); transform: translateY(-8px) scale(.95); }
+  to   { opacity:1; -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
+}
+@keyframes dropPop {
+  from { opacity:0; -webkit-transform: translateY(-8px) scale(.95); transform: translateY(-8px) scale(.95); }
+  to   { opacity:1; -webkit-transform: translateY(0) scale(1); transform: translateY(0) scale(1); }
+}
+
+.drop-item {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  color: var(--sub);
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 500;
+  -webkit-transition: all .15s;
+  -o-transition: all .15s;
+     transition: all .15s;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  font-family: 'Outfit', sans-serif;
+}
+
+.drop-item:hover { background: var(--dark3); color: var(--text); }
+
+.drop-sep {
+  height: 1px;
+  background: var(--border);
+  margin: 5px 0;
+}
+
+.hero {
+  padding: 28px 24px 20px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 18px;
+}
+
+.avatar-ring {
+  position: relative;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
+
+.avatar-ring::before {
+  content:'';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  background: -webkit-conic-gradient(var(--accent), #a855f7, #3b82f6, var(--accent));
+  background: conic-gradient(var(--accent), #a855f7, #3b82f6, var(--accent));
+  -webkit-animation: spin 4s linear infinite;
+          animation: spin 4s linear infinite;
+}
+
+@-webkit-keyframes spin { to { -webkit-transform: rotate(360deg); transform: rotate(360deg); } }
+@keyframes spin { to { -webkit-transform: rotate(360deg); transform: rotate(360deg); } }
+
+.avatar-ring::after {
+  content:'';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: var(--dark1);
+}
+
+.avatar {
+  position: relative;
+  z-index: 1;
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  -o-object-fit: cover;
+     object-fit: cover;
+  display: block;
+}
+
+.hero-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  color: var(--white);
+}
+
+.hero-name em {
+  font-style: normal;
+  background: -webkit-linear-gradient(315deg, var(--accent), #a855f7);
+  background: linear-gradient(135deg, var(--accent), #a855f7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-handle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--sub);
+  margin-top: 5px;
+  letter-spacing: .5px;
+}
+
+.hero-sub {
+  font-size: 13px;
+  color: var(--sub);
+  margin-top: 3px;
+}
+
+.divline {
+  height: 1px;
+  background: -webkit-linear-gradient(left, transparent, var(--border), transparent);
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 0 24px;
+}
+
+.body {
+  padding: 22px 24px 26px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px; top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  font-size: 15px;
+  pointer-events: none;
+  opacity: .4;
+}
+
+.url-input {
+  width: 100%;
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 15px 16px 15px 44px;
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  outline: none;
+  -webkit-transition: all .25s;
+  -o-transition: all .25s;
+     transition: all .25s;
+}
+
+.url-input::-webkit-input-placeholder { color: var(--sub); font-family: 'Outfit', sans-serif; font-size: 14px; }
+.url-input::-moz-placeholder { color: var(--sub); font-family: 'Outfit', sans-serif; font-size: 14px; }
+.url-input:-ms-input-placeholder { color: var(--sub); font-family: 'Outfit', sans-serif; font-size: 14px; }
+.url-input::placeholder { color: var(--sub); font-family: 'Outfit', sans-serif; font-size: 14px; }
+
+.url-input:focus {
+  border-color: rgba(139,0,0,0.5);
+  background: var(--dark2);
+  -webkit-box-shadow: 0 0 0 4px rgba(139,0,0,0.1);
+          box-shadow: 0 0 0 4px rgba(139,0,0,0.1);
+}
+
+.url-input.valid { border-color: rgba(139,0,0,0.4); }
+
+.paste-hint {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--sub);
+  margin-bottom: 18px;
+  cursor: pointer;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  width: fit-content;
+  -webkit-transition: color .15s;
+  -o-transition: color .15s;
+     transition: color .15s;
+}
+.paste-hint:hover { color: var(--text); }
+.paste-hint kbd {
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.btns {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  padding: 15px 12px;
+  border-radius: 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  -webkit-transition: all .25s;
+  -o-transition: all .25s;
+     transition: all .25s;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  gap: 8px;
+}
+
+.btn:active:not(:disabled) { -webkit-transform: scale(.97); -ms-transform: scale(.97); transform: scale(.97); }
+
+.btn-video {
+  background: -webkit-linear-gradient(315deg, #8b0000 0%, #5a0000 100%);
+  background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+  color: #fff;
+  -webkit-box-shadow: 0 6px 20px rgba(139,0,0,0.4);
+          box-shadow: 0 6px 20px rgba(139,0,0,0.4);
+}
+
+.btn-video:hover:not(:disabled) {
+  -webkit-box-shadow: 0 8px 28px rgba(139,0,0,0.6);
+          box-shadow: 0 8px 28px rgba(139,0,0,0.6);
+  -webkit-transform: translateY(-1px);
+      -ms-transform: translateY(-1px);
+          transform: translateY(-1px);
+}
+
+.btn-audio {
+  background: -webkit-linear-gradient(315deg, #6b0000 0%, #3d0000 100%);
+  background: linear-gradient(135deg, #6b0000 0%, #3d0000 100%);
+  border: 1px solid rgba(139,0,0,0.4);
+  color: var(--text);
+  -webkit-box-shadow: 0 4px 14px rgba(139,0,0,0.25);
+          box-shadow: 0 4px 14px rgba(139,0,0,0.25);
+}
+
+.btn-audio:hover:not(:disabled) {
+  background: -webkit-linear-gradient(315deg, #8b0000 0%, #5a0000 100%);
+  background: linear-gradient(135deg, #8b0000 0%, #5a0000 100%);
+  border-color: rgba(139,0,0,0.6);
+  -webkit-transform: translateY(-1px);
+      -ms-transform: translateY(-1px);
+          transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+  -webkit-transform: none !important;
+      -ms-transform: none !important;
+          transform: none !important;
+  -webkit-box-shadow: none !important;
+          box-shadow: none !important;
+}
+
+.btn-icon { font-size: 16px; }
+
+.status-box {
+  border-radius: 12px;
+  padding: 13px 16px;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  display: none;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.status-box.show { display: -webkit-box; display: -webkit-flex; display: -ms-flexbox; display: flex; }
+
+.status-box.loading {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--sub);
+}
+
+.status-box.error {
+  background: rgba(139,0,0,0.08);
+  border: 1px solid rgba(139,0,0,0.25);
+  color: #ff6b7a;
+}
+
+.status-box.success {
+  background: rgba(52,211,153,0.07);
+  border: 1px solid rgba(52,211,153,0.2);
+  color: #6ee7b7;
+}
+
+.spin-icon { -webkit-animation: rotating .8s linear infinite; animation: rotating .8s linear infinite; display: inline-block; }
+@-webkit-keyframes rotating { to { -webkit-transform: rotate(360deg); transform: rotate(360deg); } }
+@keyframes rotating { to { -webkit-transform: rotate(360deg); transform: rotate(360deg); } }
+
+.links-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--sub);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.links {
+  display: -ms-grid;
+  display: grid;
+  -ms-grid-columns: 1fr;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.link-card {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 10px;
+  padding: 13px 14px;
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  text-decoration: none;
+  color: var(--sub);
+  font-size: 13px;
+  font-weight: 500;
+  -webkit-transition: all .2s;
+  -o-transition: all .2s;
+     transition: all .2s;
+}
+
+.link-card:hover {
+  border-color: var(--borderH);
+  color: var(--text);
+  background: var(--dark2);
+  -webkit-transform: translateY(-2px);
+      -ms-transform: translateY(-2px);
+          transform: translateY(-2px);
+  -webkit-box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+          box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.link-badge {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  font-size: 18px;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
+}
+
+.badge-ch { background: rgba(37,211,102,0.12); }
+
+.link-title { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.link-sub   { font-size: 11px; color: var(--sub); margin-top: 1px; }
+
+.footer {
+  text-align: center;
+  padding: 0 24px 20px;
+  font-size: 11px;
+  color: var(--sub);
+  letter-spacing: .3px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+#dlLink { display:none; }
+
+@media(max-width:480px) {
+  .hero-name { font-size: 1.6rem; }
+  .avatar { width: 58px; height: 58px; }
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<div class="card">
+
+  <div class="topbar">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <!-- WA Icon -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="#fff" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+      </div>
+      <span class="logo-text">TT Downloader</span>
+    </div>
+    <div class="menu-wrap">
+      <button class="menu-btn" onclick="toggleMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="dropdown" id="dropdown">
+        <a href="https://whatsapp.com/channel/0029Vb7gcbuLdQelWzrTzD3D" class="drop-item" target="_blank">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+          &nbsp;Channel WA
+        </a>
+        <div class="drop-sep"></div>
+        <button class="drop-item" onclick="showInfo()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          &nbsp;Tentang Tool
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="avatar-ring">
+      <img src="https://athars.space/uploads/3ff1c2e1.jpg" alt="Avatar" class="avatar">
+    </div>
+    <div class="hero-text">
+      <div class="hero-name">TikTok <em>DL</em></div>
+      <div class="hero-handle">@RynnStecu</div>
+      <div class="hero-sub">Video & MP3 · tanpa watermark</div>
+    </div>
+  </div>
+
+  <div class="divline"></div>
+
+  <div class="body">
+
+    <div class="input-group">
+      <span class="input-icon">🔗</span>
+      <input
+        type="url"
+        class="url-input"
+        id="urlInput"
+        placeholder="Paste link TikTok di sini…"
+        autocomplete="off"
+        spellcheck="false"
+      >
+    </div>
+
+    <div class="paste-hint" onclick="pasteClipboard()">
+      <kbd>CTRL+V</kbd> atau klik untuk paste dari clipboard
+    </div>
+
+    <div class="status-box" id="statusBox">
+      <span id="statusIcon"></span>
+      <span id="statusText"></span>
+    </div>
+
+    <div class="btns">
+      <button class="btn btn-video" id="btnVideo" onclick="downloadVideo()" disabled>
+        <span class="btn-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+        </span> Download Video
+      </button>
+      <button class="btn btn-audio" id="btnAudio" onclick="downloadAudio()" disabled>
+        <span class="btn-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.55A4 4 0 1014 17V7h4V3h-6z"/></svg>
+        </span> MP3
+      </button>
+    </div>
+
+    <div class="links-label">Komunitas</div>
+    <div class="links">
+      <a href="https://whatsapp.com/channel/0029Vb7gcbuLdQelWzrTzD3D" class="link-card" target="_blank">
+        <div class="link-badge badge-ch">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#25d366" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+          </svg>
+        </div>
+        <div class="link-info">
+          <div class="link-title">Channel WA</div>
+          <div class="link-sub">WhatsApp · @RynnStecu</div>
+        </div>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="footer">v1.0 · @RynnStecu · free forever</div>
+
+</div>
+
+<a id="dlLink"></a>
+
+<script>
+const urlInput = document.getElementById('urlInput');
+const btnVideo = document.getElementById('btnVideo');
+const btnAudio = document.getElementById('btnAudio');
+const statusBox = document.getElementById('statusBox');
+const statusIcon = document.getElementById('statusIcon');
+const statusText = document.getElementById('statusText');
+
+function toggleMenu() {
+  document.getElementById('dropdown').classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.menu-wrap')) document.getElementById('dropdown').classList.remove('open');
+});
+
+function showInfo() {
+  document.getElementById('dropdown').classList.remove('open');
+  setStatus('success', '✓', 'TikTok DL v1.0 · by @RynnStecu · gratis selamanya');
+  setTimeout(clearStatus, 4000);
+}
+
+async function pasteClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) { urlInput.value = text; urlInput.dispatchEvent(new Event('input')); }
+  } catch (_) { urlInput.focus(); }
+}
+
+urlInput.addEventListener('input', () => {
+  const v = urlInput.value.trim();
+  const ok = v.includes('tiktok.com') && v.length > 15;
+  btnVideo.disabled = !ok;
+  btnAudio.disabled = !ok;
+  urlInput.classList.toggle('valid', ok);
+  if (!ok) clearStatus();
+});
+
+urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') downloadVideo(); });
+
+function setStatus(type, icon, msg) {
+  statusBox.className = 'status-box show ' + type;
+  statusIcon.innerHTML = type === 'loading' ? '<span class="spin-icon">' + icon + '</span>' : icon;
+  statusText.textContent = msg;
+}
+
+function clearStatus() { statusBox.className = 'status-box'; }
+
+function setBtns(disabled) {
+  const ok = !disabled && urlInput.value.trim().includes('tiktok.com');
+  btnVideo.disabled = disabled ? true : !ok;
+  btnAudio.disabled = disabled ? true : !ok;
+}
+
+async function getLink(url, type) {
+  const apis = [
+    'https://www.tikwm.com/api/?url=' + encodeURIComponent(url),
+    'https://api.tikmate.app/api/lookup?url=' + encodeURIComponent(url),
+  ];
+  for (const api of apis) {
+    try {
+      const r = await fetch(api);
+      const d = await r.json();
+      const s = d.data || d;
+      if (type === 'video' && s.play) return s.play;
+      if (type === 'video' && s.nwm_video_url) return s.nwm_video_url;
+      if (type === 'audio' && s.music) return s.music;
+      if (type === 'audio' && s.music_info && s.music_info.play) return s.music_info.play;
+    } catch (_) {}
+  }
+  return null;
+}
+
+async function triggerDownload(fileUrl, name, mime) {
+  try {
+    const res = await fetch(fileUrl);
+    if (!res.ok) throw new Error();
+    const blob = await res.blob();
+    const burl = URL.createObjectURL(new Blob([blob], { type: mime }));
+    const a = document.getElementById('dlLink');
+    a.href = burl; a.download = name; a.click();
+    setTimeout(() => URL.revokeObjectURL(burl), 200);
+  } catch (_) {
+    const a = document.getElementById('dlLink');
+    a.href = fileUrl; a.download = name; a.target = '_blank'; a.click(); a.target = '';
+  }
+}
+
+async function downloadVideo() {
+  const url = urlInput.value.trim();
+  if (!url) return;
+  setBtns(true);
+  setStatus('loading', '◌', 'Mengambil link video…');
+  try {
+    const link = await getLink(url, 'video');
+    if (!link) { setStatus('error', '✕', 'Gagal — coba URL lain atau cek koneksi'); setBtns(false); return; }
+    setStatus('loading', '◌', 'Mengunduh file…');
+    await triggerDownload(link, 'tiktok_video.mp4', 'video/mp4');
+    setStatus('success', '✓', 'Video berhasil diunduh!');
+    setTimeout(clearStatus, 4000);
+  } catch (_) {
+    setStatus('error', '✕', 'Terjadi kesalahan, coba lagi');
+  }
+  setBtns(false);
+}
+
+async function downloadAudio() {
+  const url = urlInput.value.trim();
+  if (!url) return;
+  setBtns(true);
+  setStatus('loading', '◌', 'Mengambil link audio…');
+  try {
+    const link = await getLink(url, 'audio');
+    if (!link) { setStatus('error', '✕', 'Gagal — coba URL lain atau cek koneksi'); setBtns(false); return; }
+    setStatus('loading', '◌', 'Mengunduh audio…');
+    await triggerDownload(link, 'tiktok_audio.mp3', 'audio/mpeg');
+    setStatus('success', '✓', 'MP3 berhasil diunduh!');
+    setTimeout(clearStatus, 4000);
+  } catch (_) {
+    setStatus('error', '✕', 'Terjadi kesalahan, coba lagi');
+  }
+  setBtns(false);
+}
+</script>
+</body>
+</html>
